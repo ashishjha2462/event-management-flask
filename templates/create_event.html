@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Event Garden-Create Event</title>
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {%if is_admin%}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {%endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/messages">N</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Create an Event</h1>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <form action="{{ url_for('create_event') }}" method="POST">
+            <label for="college_name">College Name:</label>
+            <input type="text" id="college_name" name="college_name" required>
+            
+            <label for="hall_id">Select Hall:</label>
+            <select id="hall_id" name="hall_id" required>
+                {% for hall in halls %}
+                <option value="{{ hall.id }}">{{ hall.name }} ({{ hall.location }})</option>
+                {% endfor %}
+            </select>
+
+            <label for="event_detail">Event Details:</label>
+            <textarea id="event_detail" name="event_detail" required></textarea>
+
+            <label for="start_datetime">Start Date & Time:</label>
+            <input type="datetime-local" id="start_datetime" name="start_datetime" required>
+
+            <label for="end_datetime">End Date & Time:</label>
+            <input type="datetime-local" id="end_datetime" name="end_datetime" required>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required></textarea>
+
+            <button type="submit">Create Event</button>
+        </form>
+    </div>
+</body>
+</html>

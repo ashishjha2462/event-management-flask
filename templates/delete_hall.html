@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Event Garden-Delete Hall</title>
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {%if is_admin%}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {%endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/messages">N</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <nav class="navbar-2">
+        <ul>
+            <li><a href="/admin/halls">Manage Halls</a></li>
+            <li><a href="/admin/events">Manage Events</a></li>
+            <li><a href="/admin/users">Manage Users</a></li>
+            <li><a href="/admin/tickets">Manage Tickets</a></li>
+            <li><a href="/admin/appointments">Manage Appointments</a></li>
+            <li><a href="/admin/messages">Manage Notifications</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Confirm Delete Hall</h1>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <p>Are you sure you want to delete the following hall?</p>
+        <ul>
+            <li><strong>Name:</strong> {{ hall.name }}</li>
+            <li><strong>Type:</strong> {{ hall.type }}</li>
+            <li><strong>Price:</strong> ${{ hall.price }}</li>
+            <li><strong>Location:</strong> {{ hall.location }}</li>
+            <li><strong>Capacity:</strong> {{ hall.capacity }}</li>
+        </ul>
+        {% if hall.photo %}
+            <p><strong>Photo:</strong></p>
+            <img src="/{{ hall.photo }}" alt="Hall Photo" style="width: 200px;">
+        {% else %}
+            <p><strong>Photo:</strong> No Photo Available</p>
+        {% endif %}
+        <form action="{{ url_for('delete_hall', hall_id=hall.id) }}" method="POST">
+            <button type="submit" class="btn btn-danger">Confirm Delete</button>
+            <a href="/admin/halls" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>

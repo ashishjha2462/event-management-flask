@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Event Garden-Events</title>
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {%if is_admin%}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {%endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/messages">N</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Upcoming Events</h1>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <table>
+            <thead>
+                <tr>
+                    <th>College Name</th>
+                    <th>Event Details</th>
+                    <th>Hall</th>
+                    <th>Location</th>
+                    <th>Start Date & Time</th>
+                    <th>End Date & Time</th>
+                    <th>Price</th>
+                    <th>Available Tickets</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event.college_name }}</td>
+                    <td>{{ event.event_detail }}</td>
+                    <td>{{ event.hall_name }}</td>
+                    <td>{{ event.location }}</td>
+                    <td>{{ event.start_datetime.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ event.end_datetime.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>${{ event.price }}</td>
+                    <td>{{ event.available_tickets }}</td>
+                    <td><a href="{{ url_for('book_ticket', event_id=event.id) }}" class="btn">Book Ticket</a></td>
+                </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7">No events available at the moment.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('my_bookings') }}" class="btn">My Bookings</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Event Garden-Register</title>
+        <link rel="icon" href="../static/assets/image.png" type="image/png">
+        <link rel="stylesheet" href="/static/style.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container mt-5" style="width: 40%; height: 90%; align-items: center; align-content: center;">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <h2 class="text-center">Register</h2>
+                    <form method="POST" action="{{ url_for('register') }}">
+                        <!-- Flash Messages -->
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                <div>
+                                    {% for category, message in messages %}
+                                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                            
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter a unique username" required style="background-color: #b6b6b6; color:black;">
+                        </div>
+                    
+                        <!-- Full Name -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" required style="background-color: #b6b6b6; color:black;">
+                        </div>
+                    
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter a password" required style="background-color: #b6b6b6; color:black;">
+                        </div>
+                    
+                        <!-- Confirm Password -->
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter your password" required style="background-color: #b6b6b6; color:black;">
+                        </div>
+                    
+                        <!-- Phone Number -->
+                        <div class="mb-3">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Enter your phone number" pattern="^\d{10}$" title="Enter a valid 10-digit phone number" required style="background-color: #b6b6b6; color:black;">
+                        </div>
+                    
+                        <!-- Date of Birth -->
+                        <div class="mb-3">
+                            <label for="dob" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="dob" name="dob" max="{{ today }}" required style="background-color: #b6b6b6; color:black;">
+                        </div>
+                    
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address" required style="background-color: #b6b6b6; color:black;">
+                        </div>
+                    
+                        <!-- State -->
+                        <div class="mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <select class="form-control" name="state" id="state" required style="background-color: #b6b6b6; color:black;">
+                                <option value="" disabled selected>Select State</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <input type="text" class="form-control mt-2 d-none" id="custom-state" name="custom_state" placeholder="Enter your state" style="background-color: #b6b6b6; color:black;">
+                        </div>
+                    
+                        <!-- City -->
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <select class="form-control" name="city" id="city" required style="background-color: #b6b6b6; color:black;">
+                                <option value="" disabled selected>Select City</option>
+                            </select>
+                            <input type="text" class="form-control mt-2 d-none" id="custom-city" name="custom_city" placeholder="Enter your city" style="background-color: #b6b6b6; color:black;">
+                        </div>
+                    
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                    </form>
+                
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('login') }}" style="color: aliceblue;">Already have an account? Login here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            fetch('/states-cities')
+                .then(response => response.json())
+                .then(data => {
+                    const stateSelect = document.getElementById('state');
+                    const citySelect = document.getElementById('city');
+                    const customStateInput = document.getElementById('custom-state');
+                    const customCityInput = document.getElementById('custom-city');
+                
+                    // Populate the states dropdown
+                    for (let state in data) {
+                        let option = document.createElement('option');
+                        option.value = state;
+                        option.textContent = state;
+                        stateSelect.appendChild(option);
+                    }
+                
+                    // Handle state selection
+                    stateSelect.addEventListener('change', () => {
+                        if (stateSelect.value === "Other") {
+                            customStateInput.classList.remove('d-none');
+                            customCityInput.classList.remove('d-none');
+                            citySelect.classList.add('d-none');
+                            citySelect.removeAttribute('required');
+                            customCityInput.setAttribute('required', 'true');
+                        } else {
+                            customStateInput.classList.add('d-none');
+                            customCityInput.classList.add('d-none');
+                            citySelect.classList.remove('d-none');
+                            citySelect.innerHTML = '<option value="" disabled selected>Select City</option>';
+                            citySelect.setAttribute('required', 'true');
+                            customCityInput.removeAttribute('required');
+                        
+                            // Populate cities dropdown
+                            const cities = data[stateSelect.value];
+                            cities.forEach(city => {
+                                let option = document.createElement('option');
+                                option.value = city;
+                                option.textContent = city;
+                                citySelect.appendChild(option);
+                            });
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching states and cities:', error);
+                });
+        </script>
+    </body>
+</html>

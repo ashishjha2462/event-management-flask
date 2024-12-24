@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Event Garden-Manage Tickets</title>
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {%if is_admin%}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {%endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/messages">N</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <nav class="navbar-2">
+        <ul>
+            <li><a href="/admin/halls">Manage Halls</a></li>
+            <li><a href="/admin/events">Manage Events</a></li>
+            <li><a href="/admin/users">Manage Users</a></li>
+            <li><a href="/admin/tickets">Manage Tickets</a></li>
+            <li><a href="/admin/appointments">Manage Appointments</a></li>
+            <li><a href="/admin/messages">Manage Notifications</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Manage Tickets</h1>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <h2>Existing Tickets</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Location</th>
+                    <th>Start Date & Time</th>
+                    <th>End Date & Time</th>
+                    <th>Booking Date</th>
+                    <th>Number of Tickets</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                    <tr>
+                        <td>{{ ticket.event.college_name }}</td>
+                        <td>{{ ticket.event.location }}</td>
+                        <td>{{ ticket.event.start_datetime.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ ticket.event.end_datetime.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ ticket.booking_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ ticket.number_of_tickets }}</td>
+                        <td>
+                            <form action="{{ url_for('edit_ticket', ticket_id=ticket.id) }}" method="POST" style="display:inline;">
+                                <input type="number" name="new_ticket_count" min="1" max="{{ ticket.number_of_tickets }}" value="{{ ticket.number_of_tickets }}" style="width: 40px;" required>
+                                <button type="submit" onclick="return confirm('Are you sure you want to update this booking?')">Update</button>
+                            </form>
+                            <form action="{{ url_for('cancel_booking', ticket_id=ticket.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" onclick="return confirm('Are you sure you want to cancel this booking?')">Delete</button>
+                            </form>
+                        </td>                        
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5">No tickets booked yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>       
+    </div>
+</body>
+</html>

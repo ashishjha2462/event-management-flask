@@ -1,0 +1,463 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url("assets/photo-1653821355736-0c2598d0a63e.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+.container {
+    max-width: 60%;
+    margin: 50px auto;
+    background: rgba(43, 42, 42, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: aliceblue;
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+h1 {
+    text-align: center;
+    color: aliceblue;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+form label {
+    color: aliceblue;
+    display: block;
+    margin: 10px 0 5px;
+    font-size: 1rem;
+    text-align: left;
+}
+
+form input, form select, form button, textarea {
+    width: 97%;
+    padding: 12px;
+    background-color: #555;
+    margin: 5px 0 15px;
+    border: none;
+    border-radius: 5px;
+    color: aliceblue;
+    font-size: 1rem;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+form input:focus, form select:focus, textarea:focus {
+    background-color: #777;
+    outline: none;
+    transform: scale(1.02);
+    color:white;
+}
+
+form button {
+    background: linear-gradient(90deg, #007BFF, #0056b3);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+form button:hover {
+    background: linear-gradient(90deg, #0056b3, #007BFF);
+    transform: scale(1.05);
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #007BFF, #0056b3);
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+    background: linear-gradient(90deg, #0056b3, #007BFF);
+    transform: scale(1.05);
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #8bb7e6;
+}
+
+/* General navbar styles */
+.navbar {
+    background-color: rgba(54, 54, 77, 0.9);
+    padding: 10px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar li {
+    padding: 10px;
+    text-align: center;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 10px;
+    transition: color 0.3s ease;
+}
+
+.navbar a:hover {
+    color: #8bb7e6;
+}
+
+.navbar-2 {
+    background-color: rgba(71, 71, 99, 0.9);
+    padding: 10px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.navbar-2 ul {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-2 li {
+    padding: 10px;
+}
+
+.navbar-2 a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 10px;
+    transition: color 0.3s ease;
+}
+
+.navbar-2 a:hover {
+    color: #86b3e4;
+}
+
+th{
+    background-color: #555;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .navbar ul {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar-2 ul {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    form input, form select, textarea {
+        width: 97%;
+        padding: 12px;
+        background-color: #555;
+        margin: 5px 0 15px;
+        border: none;
+        border-radius: 5px;
+        color: aliceblue;
+        font-size: 1rem;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    form button {
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+tr{
+    transition: background-color 0.3s ease;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Styling for the social media container */
+.social-media {
+    text-align: center; /* Center align the content */
+    margin: 20px 0;
+}
+
+/* Heading style */
+.social-media h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #fdfdfd; /* Dark color for the text */
+}
+
+/* Style for the social media list */
+.social-media ul {
+    list-style: none; /* Remove bullet points */
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Space between icons */
+}
+
+/* Style for each list item */
+.social-media li {
+    display: inline-block;
+}
+
+/* Style for the social media icons */
+.social-media a img {
+    width: 40px; /* Set a fixed size for the icons */
+    height: 40px;
+    transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth hover effect */
+}
+
+/* Hover effect for the icons */
+.social-media a:hover img {
+    transform: scale(1.1); /* Slightly enlarge the icon */
+    opacity: 0.8; /* Add opacity change */
+}
+
+
+/* Container to hold all event cards */
+.events-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Grid layout with responsive columns */
+    gap: 20px; /* Space between cards */
+    margin: 20px 0;
+}
+
+/* Style for each event card */
+.event-card {
+    border: 1px solid #483f3f;
+    border-radius: 8px;
+    overflow: hidden; /* To ensure the image stays within the card */
+    background-color: #362f2f;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    text-align: left;
+}
+
+/* Hover effect to slightly raise the card */
+.event-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(160, 160, 160, 0.2);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Style for the image at the top of each card */
+.event-photo {
+    width: 100%;
+    height: 200px;
+    object-fit: cover; /* Ensures the image covers the space without distortion */
+}
+
+/* Details section below the photo */
+.event-details {
+    padding: 15px;
+}
+
+/* Heading for the event name */
+.event-details h3 {
+    font-size: 1.2rem;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+/* Styling for event info (like college name, hall, etc.) */
+.event-details p {
+    margin: 5px 0;
+    color: #ffffff;
+}
+
+/* Styling for the 'No events available' message */
+.no-events {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #464040;
+}
+
+
+/* Container to hold all event cards */
+.halls-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Grid layout with responsive columns */
+    gap: 20px; /* Space between cards */
+    margin: 20px 0;
+}
+
+/* Style for each event card */
+.hall-card {
+    border: 1px solid #483f3f;
+    border-radius: 8px;
+    overflow: hidden; /* To ensure the image stays within the card */
+    background-color: #362f2f;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    text-align: left;
+}
+
+.hall-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(160, 160, 160, 0.2);
+    transition: transform 0.3s ease-in-out;
+}
+
+.hall-photo {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.hall-details {
+    padding: 15px;
+}
+
+.hall-details h3 {
+    font-size: 1.2rem;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.hall-details p {
+    margin: 5px 0;
+    color: #ffffff;
+}
+
+.no-halls {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #464040;
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+    align-self: center;
+}
+
+.about-container {
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+}
+
+.about-image {
+    flex: 0 0 40%; /* Image takes up 40% of the width */
+    background-image: url('/static/assets/aboutus.jpg');
+    background-size: cover; /* Ensure the image covers the entire area */
+    background-position: center; /* Center the image */
+    border-radius: 10px 0 0 10px; /* Rounded corners on the left */
+}
+
+.about-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #373535; /* Optional background for contrast */
+    border-radius: 0 10px 10px 0; /* Rounded corners on the right */
+}
+
+.contact-container {
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+}
+
+.contact-image {
+    flex: 0 0 40%; /* Image takes up 40% of the width */
+    background-image: url('/static/assets/contactus.jpg');
+    background-size: cover; /* Ensure the image covers the entire area */
+    background-position: center; /* Center the image */
+    border-radius: 10px 0 0 10px; /* Rounded corners on the left */
+}
+
+.contact-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #373535; /* Optional background for contrast */
+    border-radius: 0 10px 10px 0; /* Rounded corners on the right */
+}
+
+.card {
+    border: 1px solid #483f3f;
+    border-radius: 8px;
+    background-color: #362f2f;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    text-align: left;
+    padding: 15px;
+}
+
+.card h2 {
+    margin-top: 0;
+}
+
+.card form input,
+.card form button {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    width: 95%;
+}
+
+.card ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.card ul li {
+    margin: 10px 0;
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Appointment</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {% if is_admin %}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {% endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All Events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/messages">Notifications</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <nav class="navbar-2">
+        <ul>
+            <li><a href="/admin/halls">Manage Halls</a></li>
+            <li><a href="/admin/events">Manage Events</a></li>
+            <li><a href="/admin/users">Manage Users</a></li>
+            <li><a href="/admin/tickets">Manage Tickets</a></li>
+            <li><a href="/admin/appointments">Manage Appointments</a></li>
+            <li><a href="/admin/messages">Manage Notifications</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Edit Appointment</h1>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('edit_appointment', appointment_id=appointment.id) }}">
+            <!-- Select User -->
+            <label for="user_id">Select User:</label>
+            <select id="user_id" name="user_id" required>
+                {% for user in users %}
+                <option value="{{ user.id }}" {% if user.id == appointment.user_id %}selected{% endif %}>
+                    {{ user.name }} ({{ user.username }})
+                </option>
+                {% endfor %}
+            </select>
+        
+            <!-- Select Event -->
+            <label for="event_id">Select Event:</label>
+            <select id="event_id" name="event_id" required>
+                {% for event in events %}
+                <option value="{{ event.id }}" {% if event.id == appointment.event_id %}selected{% endif %}>
+                    {{ event.event_detail }}
+                </option>
+                {% endfor %}
+            </select>
+        
+            <!-- Select Hall -->
+            <label for="hall_id">Select Hall:</label>
+            <select id="hall_id" name="hall_id" required>
+                {% for hall in halls %}
+                <option value="{{ hall.id }}" {% if hall.id == appointment.hall_id %}selected{% endif %}>
+                    {{ hall.name }}
+                </option>
+                {% endfor %}
+            </select>
+        
+            <!-- Date -->
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" value="{{ appointment.date.strftime('%Y-%m-%d') }}" required>
+        
+            <!-- Time -->
+            <label for="time">Time:</label>
+            <input type="time" id="time" name="time" value="{{ appointment.time.strftime('%H:%M') }}" required>
+        
+            <!-- Submit -->
+            <button type="submit">Update Appointment</button>
+        </form>        
+        <a href="/admin/appointments">Back to Manage Appointments</a>
+    </div>
+</body>
+</html>

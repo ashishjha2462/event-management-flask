@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Event Garden-About</title>
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {%if is_admin%}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {%endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/messages">N</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="about-container">
+            <!-- Image Section -->
+            <div class="about-image"></div>
+
+            <!-- Text Content Section -->
+            <div class="about-content">
+                <h1>About Us</h1>
+                <p>
+                    Welcome to Event Garden! We are passionate about making your events memorable, seamless, and perfectly organized.
+                    <br><br>
+                    Event Garden is a one-stop solution for all your event needs. From corporate seminars and birthday parties to
+                    grand weddings and public gatherings, our platform provides the tools and services you need to bring your
+                    event to life.
+                    <br><br>
+                    Whether you're looking to book a hall, manage ticket sales, or plan every detail of your event, we've got you
+                    covered. With an easy-to-use interface and a dedicated support team, Event Garden ensures a smooth and hassle-free
+                    experience for both organizers and attendees.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

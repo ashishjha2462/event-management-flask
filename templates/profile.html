@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Event Garden - Profile</title>
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {% if is_admin %}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {% endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>My Profile</h1>
+        
+        <!-- User Information Card -->
+        <div class="card">
+            <h2>User Information</h2>
+            <form method="POST">
+                <label>Name:</label>
+                <input type="text" name="name" value="{{ user.name }}" required>
+                
+                <label>Phone Number:</label>
+                <input type="text" name="phone_number" value="{{ user.phone_number }}" required>
+                
+                <label>Date of Birth:</label>
+                <input type="date" name="dob" value="{{ user.dob }}">
+                
+                <label>City:</label>
+                <input type="text" name="city" value="{{ user.city }}" required>
+                
+                <label>State:</label>
+                <input type="text" name="state" value="{{ user.state }}" required>
+                
+                <button type="submit">Update Information</button>
+            </form>
+        </div>
+
+        <!-- Events Created Card -->
+        <div class="card">
+            <h2>My Events</h2>
+            {% if events %}
+                <ul>
+                    {% for event in events %}
+                        <li>
+                            <strong>{{ event.college_name }}</strong> - {{ event.event_detail }}
+                            <br>Location: {{ event.location }}
+                            <br>Date: {{ event.start_datetime.strftime('%Y-%m-%d %H:%M') }} to {{ event.end_datetime.strftime('%Y-%m-%d %H:%M') }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>You have not created any events yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Tickets Booked Card -->
+        <div class="card">
+            <h2>My Bookings</h2>
+            {% if tickets %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Location</th>
+                            <th>Booking Date</th>
+                            <th>Tickets</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                            <tr>
+                                <td>{{ ticket.event.college_name }}</td>
+                                <td>{{ ticket.event.location }}</td>
+                                <td>{{ ticket.booking_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ ticket.number_of_tickets }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>You have not booked any tickets yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Event Garden-Contact</title>
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {%if is_admin%}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {%endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/messages">N</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="contact-container">
+            <!-- Image Section -->
+            <div class="contact-image"></div>
+
+            <!-- Text Content Section -->
+            <div class="contact-content">
+                <h1>Contact Us</h1>
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div>
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                <p>
+                    For any questions or inquiries, please feel free to contact us at:
+                    <br>
+                    Email: <a href="mailto:ashish.jha.2462@gmail.com">Mail-Us</a>
+                    <br>
+                    Phone: +91 956-456-7890
+                    <br>
+                    Address: 123 Main St, City, State, Zip Code
+                    <br>
+                    <br>
+                    We are here to help you with your event planning needs. Feel free to reach out!
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Event Garden-Admin Dashboard</title>
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {%if is_admin%}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {%endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/messages">N</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <nav class="navbar-2">
+        <ul>
+            <li><a href="/admin/halls">Manage Halls</a></li>
+            <li><a href="/admin/events">Manage Events</a></li>
+            <li><a href="/admin/users">Manage Users</a></li>
+            <li><a href="/admin/tickets">Manage Tickets</a></li>
+            <li><a href="/admin/appointments">Manage Appointments</a></li>
+            <li><a href="/admin/messages">Manage Notifications</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <p>Welcome to the admin dashboard. Use the navigation menu to manage the platform.</p>
+        <h1>Upcoming Events</h1>
+        <div class="events-container">
+            {% for event in events %}
+            <a class="event-card" href="{{ url_for('book_ticket', event_id=event.id) }}">
+                <div>
+                    <img src="{{ event.hall_photo or '/static/default-photo.jpg' }}" alt="{{ event.event_name or 'Event Photo' }}" class="event-photo">
+                    <div class="event-details">
+                        <h3>{{ event.event_name or 'Unnamed Event' }}</h3>
+                        <p><strong>College:</strong> {{ event.college_name or 'Not Specified' }}</p>
+                        <p><strong>Hall:</strong> {{ event.hall_name or 'Not Specified' }}</p>
+                        <p><strong>Location:</strong> {{ event.location or 'Not Specified' }}</p>
+                        <p><strong>Start:</strong> {{ event.start_datetime.strftime('%Y-%m-%d %H:%M') if event.start_datetime else 'Not Specified' }}</p>
+                        <p><strong>End:</strong> {{ event.end_datetime.strftime('%Y-%m-%d %H:%M') if event.end_datetime else 'Not Specified' }}</p>
+                        <p><strong>Price:</strong> ${{ event.price or 'Free' }}</p>
+                        <p><strong>Available Tickets:</strong> {{ event.available_tickets if event.available_tickets is not none else 'N/A' }}</p>
+                    </div>
+                </div>
+            </a>
+            {% else %}
+            <div class="no-events">
+                <p>No events available at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+        <h1>All Halls</h1>
+        <div class="halls-container">
+            {% for hall in halls %}
+            <a class="hall-card" href="{{ url_for('edit_hall', hall_id=hall.id) }}">
+                <div>
+                    <img src="{{ hall.photo }}" alt="{{ hall.name }}" class="hall-photo">
+                    <div class="hall-details">
+                        <h3>{{ hall.name }}</h3>
+                        <p><strong>Type:</strong> {{ hall.type }}</p>
+                        <p><strong>Price:</strong> {{ hall.price }}</p>
+                        <p><strong>Location:</strong> {{ hall.location }}</p>
+                        <p><strong>Capacity:</strong> {{ hall.capacity }}</p>
+                    </div>
+                </div>
+            </a>
+            {% else %}
+            <div class="no-halls">
+                <p>No halls available at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

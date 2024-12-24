@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Event Garden-Delete Event</title>
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {%if is_admin%}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {%endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/messages">N</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <nav class="navbar-2">
+        <ul>
+            <li><a href="/admin/halls">Manage Halls</a></li>
+            <li><a href="/admin/events">Manage Events</a></li>
+            <li><a href="/admin/users">Manage Users</a></li>
+            <li><a href="/admin/tickets">Manage Tickets</a></li>
+            <li><a href="/admin/appointments">Manage Appointments</a></li>
+            <li><a href="/admin/messages">Manage Notifications</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Confirm Delete Event</h1>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <p>Are you sure you want to delete the following event?</p>
+        <ul>
+            <li><strong>College Name:</strong> {{ event.college_name }}</li>
+            <li><strong>Event Details:</strong> {{ event.event_detail }}</li>
+            <li><strong>Hall:</strong> {{ event.hall_name }}</li>
+            <li><strong>Location:</strong> {{ event.location }}</li>
+            <li><strong>Start Date & Time:</strong> {{ event.start_datetime.strftime('%Y-%m-%d %H:%M') }}</li>
+            <li><strong>End Date & Time:</strong> {{ event.end_datetime.strftime('%Y-%m-%d %H:%M') }}</li>
+            <li><strong>Description:</strong> {{ event.description }}</li>
+        </ul>
+        <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST">
+            <button type="submit" class="btn btn-danger">Confirm Delete</button>
+            <a href="/admin/events" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>

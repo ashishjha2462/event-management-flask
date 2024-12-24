@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Event Garden-Book Ticket</title>
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {%if is_admin%}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {%endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/messages">N</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Book Ticket for {{ event.college_name }}</h1>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <p><strong>Event Details:</strong> {{ event.event_detail }}</p>
+        <p><strong>Location:</strong> {{ event.location }}</p>
+        <p><strong>Start:</strong> {{ event.start_datetime.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p><strong>End:</strong> {{ event.end_datetime.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p><strong>Price:</strong> ${{ event.price }}</p>
+        <form action="{{ url_for('book_ticket', event_id=event.id) }}" method="POST">
+            <label for="number_of_tickets">Number of Tickets:</label>
+            <input type="number" id="number_of_tickets" name="number_of_tickets" min="1" max="{{ available_tickets }}" required>
+            <p><small>Available Tickets: {{ available_tickets }}</small></p>
+            <button type="submit" class="btn">Confirm Booking</button>
+        </form>
+    </div>
+</body>
+</html>

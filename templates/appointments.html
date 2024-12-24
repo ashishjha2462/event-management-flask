@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Garden-Your Appointments</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {%if is_admin%}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {%endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/messages">N</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Your Appointments</h1>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <h2>Existing Appointments</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Hall</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                <tr>
+                    <td>{{ appointment.event.event_detail }}</td>
+                    <td>{{ appointment.hall.name }}</td>
+                    <td>{{ appointment.date }}</td>
+                    <td>{{ appointment.time.strftime('%H:%M') }}</td>
+                    <td>{{ appointment.status }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">No appointments found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Request an Appointment</h2>
+        <form method="POST">
+            <label for="event_id">Select Event:</label>
+            <select name="event_id" id="event_id" required>
+                {% for event in events %}
+                <option value="{{ event.id }}">{{ event.event_detail }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="hall_id">Select Hall:</label>
+            <select name="hall_id" id="hall_id" required>
+                {% for hall in halls %}
+                <option value="{{ hall.id }}">{{ hall.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="date">Select Date:</label>
+            <input type="date" id="date" name="date" required>
+
+            <label for="time">Select Time:</label>
+            <input type="time" id="time" name="time" required>
+
+            <button type="submit">Request Appointment</button>
+        </form>
+    </div>
+</body>
+</html>
