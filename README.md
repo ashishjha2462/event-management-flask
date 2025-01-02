@@ -54,12 +54,12 @@ Welcome to **Event Garden**, a 🌐 web-based event management system built usin
 ### 📜 Steps to Set Up
 1. 🌀 Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/ashishjha2462/event-management-flask/tree/master
    ```
 
 2. 🗂️ Navigate to the project directory:
    ```bash
-   cd event-garden
+   cd event-management-flask
    ```
 
 3. Set up a 📦 virtual environment:
