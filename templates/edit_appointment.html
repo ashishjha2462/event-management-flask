@@ -11,16 +11,27 @@
     <nav class="navbar">
         <ul>
             <li><a href="/">Home</a></li>
-            {% if is_admin %}
+            {%if is_admin%}
                 <li><a href="/admin">Admin Dashboard</a></li>
-            {% endif %}
+            {%endif %}
             <li><a href="/about">About</a></li>
             <li><a href="/contact">Contact Us</a></li>
             <li><a href="/create-event">Create Event</a></li>
-            <li><a href="/events">All Events</a></li>
+            <li><a href="/events">All events</a></li>
             <li><a href="/my-bookings">Booked Tickets</a></li>
             <li><a href="/make-appointment">Appointments</a></li>
-            <li><a href="/messages">Notifications</a></li>
+            <li><a href="/profile">Profile</a></li>
+            <li class="nav-item" style="background-color: rgb(201, 221, 239); border-radius: 50%;">
+                {% if has_notifications %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/active.png') }}" alt="Active Notifications" class="notification-icon">
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/inactive.png') }}" alt="No Notifications" class="notification-icon">
+                    </a>
+                {% endif %}
+            </li>
             <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>

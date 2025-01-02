@@ -461,3 +461,9 @@ table{
 .card ul li {
     margin: 10px 0;
 }
+
+.notification-icon {
+    width: 24px; /* Adjust size as needed */
+    height: 24px;
+    vertical-align: middle;
+}

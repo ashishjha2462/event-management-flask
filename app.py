@@ -21,6 +21,7 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = MAIL_USERNAME
 app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
 app.config['MAIL_DEFAULT_SENDER'] = MAIL_DEFAULT_SENDER
+app.permanent_session_lifetime = timedelta(hours=1)
 
 mail = Mail(app)
 
@@ -101,6 +102,97 @@ def is_overlapping_appointment(date, time, appointment_id=None):
 
     # Return True if any overlapping appointment exists
     return query.first() is not None
+
+def create_event_payment(event_id, user_id):
+    event_payment = EventPayment(
+        event_id=event_id,
+        user_id=user_id,
+        status='Pending'
+    )
+    db.session.add(event_payment)
+    db.session.commit()
+    return event_payment.id
+
+def create_ticket_payment(ticket_id, user_id):
+    ticket_payment = TicketPayment(
+        ticket_id=ticket_id,
+        user_id=user_id,
+        status='Pending'
+    )
+    db.session.add(ticket_payment)
+    db.session.commit()
+    return ticket_payment.id
+
+def payment_event(event_id):
+    # event = Events.query.get(event_id)
+    event_pay = EventPayment.query.filter_by(event_id=event_id).first()
+    print(event_pay)
+    event_pay.status = 'Paid'
+    db.session.commit()
+    user_id = session.get('user_id')
+    message = "Event Payment successfull"
+    send_message(message, user_id, "Admin")
+    # if not event:
+    #     return "Event not found"
+
+    # payment = paypalrestsdk.Payment({
+    #     "intent": "sale",
+    #     "payer": {
+    #         "payment_method": "paypal"
+    #     },
+    #     "redirect_urls": {
+    #         "return_url": url_for("payment_success", event_id=event_id, _external=True),
+    #         "cancel_url": url_for("event_details", event_id=event_id, _external=True)
+    #     },
+    #     "transactions": [{
+    #         "amount": {
+    #             "currency": "INR",
+    #             "total": str(event.price)
+    #         },
+    #         "description": f"Event booking for {event.college_name}"
+    #     }]
+    # })
+    
+    # # Execute payment
+    # if payment.create():
+    #     return payment.links[1]["href"]
+    # else:
+    #     return "Payment failed"
+
+def payment_ticket(ticket_id):
+    # ticket = Tickets.query.get(ticket_id)
+    ticket_payment = TicketPayment.query.get(ticket_id)
+    ticket_payment.status = 'Paid'
+    db.session.commit()
+    user_id = session.get('user_id')
+    message = "Event Payment successfull"
+    send_message(message, user_id, "Admin")
+    # if not ticket:
+    #     return "Ticket not found"
+
+    # payment = paypalrestsdk.Payment({
+    #     "intent": "sale",
+    #     "payer": {
+    #         "payment_method": "paypal"
+    #     },
+    #     "redirect_urls": {
+    #         "return_url": url_for("payment_success", ticket_id=ticket_id, _external=True),
+    #         "cancel_url": url_for("ticket_details", ticket_id=ticket_id, _external=True)
+    #     },
+    #     "transactions": [{
+    #         "amount": {
+    #             "currency": "INR",
+    #             "total": str(ticket.price)
+    #         },
+    #         "description": f"Ticket booking for {ticket.event.college_name}"
+    #     }]
+    # })
+    
+    # # Execute payment
+    # if payment.create():
+    #     return payment.links[1]["href"]
+    # else:
+    #     return "Payment failed"
 
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -318,16 +410,34 @@ def login():
     if request.method == 'POST':
         email = request.form['email'].strip()
         password = request.form['password']
-
          
         user = Users.query.filter_by(email=email).first()
-
          
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
             session['username'] = user.username
             session['is_admin'] = user.is_admin
+            session.permanent = True
             flash('Login successful!', 'success')
+            user_events = Events.query.filter(Events.created_by == session['user_id']).all()
+            for event in user_events:
+                if not EventPayment.query.filter(EventPayment.event_id == event.id).all():
+                    create_event_payment(event_id=event.id, user_id=session['user_id'])
+                payments = EventPayment.query.filter(EventPayment.event_id == event.id).all()
+                for payment in payments:
+                    if payment.status == 'Pending':
+                        message = 'Payment is pending for event ' + event.event_detail
+                        send_message(message, session['user_id'], "Admin")
+
+            user_tickets = Tickets.query.filter(Tickets.user_id == session['user_id']).all()
+            for ticket in user_tickets:
+                if not TicketPayment.query.filter(TicketPayment.ticket_id == ticket.id).all():
+                    create_ticket_payment(ticket_id=ticket.id, user_id=session['user_id'])
+                payments = TicketPayment.query.filter(TicketPayment.ticket_id == ticket.id).all()
+                for payment in payments:
+                    if payment.status == 'Pending':
+                        message = 'Payment is pending for ticket booking for ' + ticket.event.event_detail
+                        send_message(message, session['user_id'], "Admin")
             return redirect(url_for('admin') if user.is_admin else url_for('home'))
         else:
             flash('Invalid email or password!', 'danger')
@@ -387,6 +497,11 @@ def create_event():
             db.session.commit()
 
             flash('Event created successfully!', 'success')
+            user_id = session.get('user_id')
+            message = "Event created successfully"
+            send_message(message, user_id, "Admin")
+            
+            create_event_payment(event_id=new_event.id, user_id=user_id)
 
             subject = f"Event Creation Confirmation for {new_event.event_detail}"
             body = f"""
@@ -407,7 +522,7 @@ def create_event():
             """
             send_email(user.email, subject, body)
 
-            return redirect(url_for('events'))
+            return redirect(url_for('event_payment', event_id=new_event.id))
 
         except Exception as e:
             flash(f'An error occurred: {str(e)}', 'danger')
@@ -417,11 +532,9 @@ def create_event():
 @app.route('/events')
 def events():
     is_admin = session.get('is_admin')
-    try:
-         
+    try: 
         all_events = Events.query.order_by(Events.start_datetime.asc()).all()
 
-         
         event_data = []
         for event in all_events:
             booked_tickets = Tickets.query.filter_by(event_id=event.id).with_entities(
@@ -448,7 +561,7 @@ def events():
 @app.route('/admin/users')
 def manage_users():
     users = Users.query.all()
-    return render_template('manage_users.html', users=users)
+    return render_template('manage_users.html', users=users, is_admin = session.get('is_admin'))
 
 @app.route('/admin/users/edit/<int:user_id>', methods=['GET', 'POST'])
 def edit_user(user_id):
@@ -467,7 +580,7 @@ def edit_user(user_id):
         flash('User updated successfully!', 'success')
         return redirect(url_for('manage_users'))
 
-    return render_template('edit_user.html', user=user)
+    return render_template('edit_user.html', user=user, is_admin = session.get('is_admin'))
 
 @app.route('/admin/users/delete/<int:user_id>', methods=['GET', 'POST'])
 def delete_user(user_id):
@@ -484,7 +597,7 @@ def delete_user(user_id):
         flash('User and related data deleted successfully!', 'success')
         return redirect(url_for('manage_users'))
 
-    return render_template('delete_user.html', user=user)
+    return render_template('delete_user.html', user=user, is_admin = session.get('is_admin'))
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
@@ -511,7 +624,7 @@ def profile():
     
     events = Events.query.filter(Events.created_by == user_id).all()
     tickets = Tickets.query.filter(Tickets.user_id == user_id).all()
-    return render_template('profile.html', user=user, events=events, tickets=tickets)
+    return render_template('profile.html', user=user, events=events, tickets=tickets, is_admin = session.get('is_admin'))
 
 @app.route('/admin/halls', methods=['GET', 'POST'])
 def manage_halls():
@@ -589,7 +702,7 @@ def edit_hall(hall_id):
 
         return redirect(url_for('manage_halls'))
 
-    return render_template('edit_hall.html', hall=hall)
+    return render_template('edit_hall.html', hall=hall, is_admin = session.get('is_admin'))
 
 @app.route('/admin/halls/delete/<int:hall_id>', methods=['POST'])
 def delete_hall(hall_id):
@@ -612,7 +725,7 @@ def delete_hall(hall_id):
     except Exception as e:
         flash(f'Error deleting hall: {e}', 'danger')
 
-    return redirect(url_for('manage_halls'))
+    return redirect(url_for('manage_halls'), is_admin = session.get('is_admin'))
 
 @app.route('/admin/events', methods=['GET', 'POST'])
 def manage_events():
@@ -667,7 +780,7 @@ def manage_events():
         except Exception as e:
             flash(f'Error adding event: {e}', 'danger')
     events = Events.query.all()
-    return render_template('manage_events.html', events=events, halls=halls)
+    return render_template('manage_events.html', events=events, halls=halls, is_admin = session.get('is_admin'))
 
 @app.route('/admin/events/edit/<int:event_id>', methods=['GET', 'POST'])
 def edit_event(event_id):
@@ -707,7 +820,7 @@ def edit_event(event_id):
 
         return redirect(url_for('manage_events'))
 
-    return render_template('edit_event.html', event=event, halls=halls)
+    return render_template('edit_event.html', event=event, halls=halls, is_admin = session.get('is_admin'))
 
 @app.route('/admin/events/delete/<int:event_id>', methods=['POST'])
 def delete_event(event_id):
@@ -732,7 +845,7 @@ def manage_tickets():
         return redirect(url_for('login'))
     
     tickets = Tickets.query.all()
-    return render_template('manage_tickets.html', tickets=tickets)
+    return render_template('manage_tickets.html', tickets=tickets, is_admin = session.get('is_admin'))
 
 @app.route('/admin/tickets/edit/<int:ticket_id>', methods=['POST'])
 def edit_ticket(ticket_id):
@@ -790,6 +903,9 @@ def cancel_booking(ticket_id):
         db.session.delete(ticket)
         db.session.commit()
         flash('Ticket cancellation successful!', 'success')
+        user_id = session.get('user_id')
+        message = "Ticket cancelled successfully"
+        send_message(message, user_id, "Admin")
         return redirect(url_for('manage_tickets'))
     except Exception as e:
         flash(f'Error cancelling ticket: {e}', 'danger')
@@ -852,6 +968,9 @@ def book_ticket(event_id):
             Event Management Team
             """
             send_email(user.email, subject, body)
+            user_id = session.get('user_id')
+            message = "Ticket booked successfully"
+            send_message(message, user_id, "Admin")
 
             flash('Tickets booked successfully!', 'success')
             return redirect(url_for('events'))
@@ -895,6 +1014,9 @@ def cancel_booking_user(ticket_id):
         db.session.delete(ticket)
         db.session.commit()
         flash('Ticket cancellation successful!', 'success')
+        user_id = session.get('user_id')
+        message = "Ticket cancelled successfully"
+        send_message(message, user_id, "Admin")
         return redirect(url_for('my_bookings'))
     except Exception as e:
         flash(f'Error cancelling ticket: {e}', 'danger')
@@ -958,7 +1080,7 @@ def make_appointment():
         except Exception as e:
             flash(f'Error creating appointment: {str(e)}', 'danger')
 
-    return render_template('appointments.html', appointments=user_appointments, events=events, halls=halls)
+    return render_template('appointments.html', appointments=user_appointments, events=events, halls=halls, is_admin = session.get('is_admin'))
 
 @app.route('/admin/appointments', methods=['GET', 'POST'])
 def manage_appointments():
@@ -1000,7 +1122,7 @@ def manage_appointments():
         except Exception as e:
             flash(f'Error adding appointment: {str(e)}', 'danger')
 
-    return render_template('manage_appointments.html', appointments=appointments)
+    return render_template('manage_appointments.html', appointments=appointments, is_admin = session.get('is_admin'))
 
 @app.route('/admin/appointments/complete/<int:appointment_id>', methods=['POST'])
 def complete_appointment(appointment_id):
@@ -1076,7 +1198,7 @@ def edit_appointment(appointment_id):
         except Exception as e:
             flash(f'Error updating appointment: {str(e)}', 'danger')
 
-    return render_template('edit_appointment.html', appointment=appointment, events=events, halls=halls, users = users)
+    return render_template('edit_appointment.html', appointment=appointment, events=events, halls=halls, users = users, is_admin = session.get('is_admin'))
 
 @app.route('/admin/appointments/delete/<int:appointment_id>', methods=['POST'])
 def delete_appointment(appointment_id):
@@ -1105,7 +1227,7 @@ def messages():
     if request.method == 'POST':
         try:
             new_message = MessageBox(
-                user_id=user_id,
+                user_id=1,
                 sender=user.username,
                 message=request.form['message'].strip(),
                 status='unread'
@@ -1116,11 +1238,8 @@ def messages():
         except Exception as e:
             flash(f'Error sending message: {str(e)}', 'danger')
 
-    if session.get('is_admin'):
-        user_messages = MessageBox.query.order_by(MessageBox.id.desc()).all()
-    else:
-        user_messages = MessageBox.query.filter_by(user_id=user_id).order_by(MessageBox.id.desc()).all()
-    return render_template('messages.html', messages=user_messages, c_user=user)
+    user_messages = MessageBox.query.filter_by(user_id=user_id).order_by(MessageBox.id.desc()).all()
+    return render_template('messages.html', messages=user_messages, c_user=user, is_admin = session.get('is_admin'))
 
 @app.route('/messages/mark_read/<int:message_id>', methods=['POST'])
 def mark_message_read_user(message_id):
@@ -1136,6 +1255,24 @@ def mark_message_read_user(message_id):
     except Exception as e:
         flash(f'Error marking message as read: {str(e)}', 'danger')
 
+    return redirect(url_for('messages'))
+
+@app.route('/messages/mark_all_read', methods=['POST'])
+def mark_all_message_read():
+    if not session.get('user_id'):
+        flash('Please log in to view messages!', 'danger')
+        return redirect(url_for('login'))
+
+    messages = MessageBox.query.filter(MessageBox.user_id == session.get('user_id')).all()
+    for message in messages:
+        print(message, message.status)
+        try:
+            message.status = 'read'
+            db.session.commit()
+        except Exception as e:
+            flash(f'Error marking message as read: {str(e)}', 'danger')
+
+    flash('Messages marked as read!', 'success')
     return redirect(url_for('messages'))
 
 @app.route('/admin/messages', methods=['GET', 'POST'])
@@ -1164,7 +1301,7 @@ def admin_messages():
     c_messages = MessageBox.query.order_by(MessageBox.id.desc()).all()
     for msg in c_messages:
         print(msg)
-    return render_template('admin_messages.html', messages=c_messages, users = users, c_user=user)
+    return render_template('admin_messages.html', messages=c_messages, users = users, c_user=user, is_admin = session.get('is_admin'))
 
 @app.route('/admin/messages/mark_read/<int:message_id>', methods=['POST'])
 def mark_message_read(message_id):
@@ -1181,6 +1318,7 @@ def mark_message_read(message_id):
         flash(f'Error marking message as read: {str(e)}', 'danger')
 
     return redirect(url_for('admin_messages'))
+
 @app.route('/admin/messages/delete_message/<int:message_id>', methods=['POST'])
 def delete_message(message_id):
     if not session.get('is_admin'):
@@ -1199,11 +1337,20 @@ def delete_message(message_id):
 
 @app.route('/messages/delete_message_user/<int:message_id>', methods=['POST'])
 def delete_message_user(message_id):
-    if not session.get('user_id'):
-        flash('Unauthorized access!', 'danger')
+    # Ensure the user is logged in
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('Unauthorized access! Please log in.', 'danger')
         return redirect(url_for('login'))
 
+    # Fetch the message
     message = MessageBox.query.get_or_404(message_id)
+
+    # Check if the user is authorized to delete this message
+    if message.user_id != user_id and not session.get('is_admin'):
+        flash('You are not authorized to delete this message!', 'danger')
+        return redirect(url_for('messages'))
+
     try:
         db.session.delete(message)
         db.session.commit()
@@ -1211,7 +1358,7 @@ def delete_message_user(message_id):
     except Exception as e:
         flash(f'Error deleting message: {str(e)}', 'danger')
 
-    return redirect(url_for('admin_messages'))
+    return redirect(url_for('messages'))
 
 @app.route('/logout')
 def logout():
@@ -1231,6 +1378,64 @@ def test_connection():
 @app.route("/states-cities")
 def states_cities():
     return jsonify(states_and_cities)
+
+@app.route('/event-payment/<int:event_id>', methods=['GET', 'POST'])
+def event_payment(event_id):
+    event = Events.query.get_or_404(event_id)
+    hall = Halls.query.filter_by(location=event.location).first()
+    
+    if request.method == 'POST':
+        card_number = request.form.get('card_number')
+        expiry_date = request.form.get('expiry_date')
+        cvv = request.form.get('cvv')
+
+        # Basic validation (additional validation should be implemented)
+        if not card_number or not expiry_date or not cvv:
+            flash('All payment fields are required!', 'danger')
+            return render_template('event_payment.html', event=event)
+        
+        # Payment logic (e.g., integrating with a payment gateway)
+        # Here, simulate success for demonstration
+        payment_event(event_id)
+        flash(f'Payment of ${hall.price} for "{event.college_name}" was successful!', 'success')
+        return redirect(url_for('events'))  # Redirect to events page or another page
+    
+    return render_template('event_payment.html', event=event, hall=hall, is_admin = session.get('is_admin'))
+
+# Ticket Payment Route
+@app.route('/ticket-payment/<int:ticket_id>', methods=['GET', 'POST'])
+def ticket_payment(ticket_id):
+    ticket = Tickets.query.get_or_404(ticket_id)
+    event = ticket.event
+    
+    if request.method == 'POST':
+        card_number = request.form.get('card_number')
+        expiry_date = request.form.get('expiry_date')
+        cvv = request.form.get('cvv')
+
+        # Basic validation (additional validation should be implemented)
+        if not card_number or not expiry_date or not cvv:
+            flash('All payment fields are required!', 'danger')
+            return render_template('ticket_payment.html', ticket=ticket, event=event, is_admin = session.get('is_admin'))
+        
+        total_price = ticket.number_of_tickets * event.price
+        
+        payment_ticket(ticket_id)
+        flash(f'Payment of ${total_price} for {ticket.number_of_tickets} tickets to "{event.college_name}" was successful!', 'success')
+        return redirect(url_for('my_bookings'))
+    
+    return render_template('ticket_payment.html', ticket=ticket, event=event, is_admin = session.get('is_admin'))
+
+@app.context_processor
+def inject_notifications():
+    user_id = session.get('user_id')
+    has_notifications = False
+
+    if user_id:
+        has_notifications = MessageBox.query.filter_by(user_id=user_id, status='Unread').count() > 0
+
+    return {'has_notifications': has_notifications}
+
 
 if __name__ == '__main__':
     app.run(debug=True)

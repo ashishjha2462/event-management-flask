@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Event Garden - Ticket Payment</title>
+    <link rel="icon" href="../static/assets/image.png" type="image/png">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {%if is_admin%}
+                <li><a href="/admin">Admin Dashboard</a></li>
+            {%endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/profile">Profile</a></li>
+            <li class="nav-item" style="background-color: rgb(201, 221, 239); border-radius: 50%;">
+                {% if has_notifications %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/active.png') }}" alt="Active Notifications" class="notification-icon">
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/inactive.png') }}" alt="No Notifications" class="notification-icon">
+                    </a>
+                {% endif %}
+            </li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Ticket Payment</h1>
+        <form action="{{ url_for('ticket_payment', ticket_id=ticket.id) }}" method="POST">
+            <h2>Ticket Details</h2>
+            <p><strong>Event Name:</strong> {{ ticket.event.college_name }}</p>
+            <p><strong>Description:</strong> {{ ticket.event.event_detail }}</p>
+            <p><strong>Date:</strong> {{ ticket.event.start_datetime.strftime('%Y-%m-%d %H:%M') }}</p>
+            <p><strong>Location:</strong> {{ ticket.event.location }}</p>
+            <p><strong>Number of Tickets:</strong> {{ ticket.number_of_tickets }}</p>
+            <p><strong>Total Price:</strong> ${{ ticket.number_of_tickets * ticket.event.price }}</p>
+            
+            <h2>Payment Details</h2>
+            <label for="card_number">Card Number:</label>
+            <input type="text" id="card_number" name="card_number" required placeholder="Enter your card number">
+            
+            <label for="expiry_date">Expiry Date:</label>
+            <input type="text" id="expiry_date" name="expiry_date" required placeholder="MM/YY">
+            
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" name="cvv" required placeholder="123">
+            
+            <button type="submit">Pay ₹{{ ticket.number_of_tickets * ticket.event.price }}</button>
+        </form>
+    </div>
+</body>
+</html>

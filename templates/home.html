@@ -20,21 +20,22 @@
             <li><a href="/events">All events</a></li>
             <li><a href="/my-bookings">Booked Tickets</a></li>
             <li><a href="/make-appointment">Appointments</a></li>
-            <li><a href="/messages">N</a></li>
+            <li><a href="/profile">Profile</a></li>
+            <li class="nav-item" style="background-color: rgb(201, 221, 239); border-radius: 50%;">
+                {% if has_notifications %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/active.png') }}" alt="Active Notifications" class="notification-icon">
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/inactive.png') }}" alt="No Notifications" class="notification-icon">
+                    </a>
+                {% endif %}
+            </li>
             <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>
     <div class="container">
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div>
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
         <h1>Welcome to Our Website</h1>
         <p>This is the home page of our Event Garden Website.</p>
         <ul>
@@ -53,13 +54,13 @@
                 <div>
                     <img src="{{ event.hall_photo or '/static/default-photo.jpg' }}" alt="{{ event.event_name or 'Event Photo' }}" class="event-photo">
                     <div class="event-details">
-                        <h3>{{ event.event_name or 'Unnamed Event' }}</h3>
+                        <h3>{{ event.college_name + " " + event.event_detail or 'Unnamed Event' }}</h3>
                         <p><strong>College:</strong> {{ event.college_name or 'Not Specified' }}</p>
                         <p><strong>Hall:</strong> {{ event.hall_name or 'Not Specified' }}</p>
                         <p><strong>Location:</strong> {{ event.location or 'Not Specified' }}</p>
                         <p><strong>Start:</strong> {{ event.start_datetime.strftime('%Y-%m-%d %H:%M') if event.start_datetime else 'Not Specified' }}</p>
                         <p><strong>End:</strong> {{ event.end_datetime.strftime('%Y-%m-%d %H:%M') if event.end_datetime else 'Not Specified' }}</p>
-                        <p><strong>Price:</strong> ${{ event.price or 'Free' }}</p>
+                        <p><strong>Price:</strong> ₹{{ event.price or 'Free' }}</p>
                         <p><strong>Available Tickets:</strong> {{ event.available_tickets if event.available_tickets is not none else 'N/A' }}</p>
                     </div>
                 </div>

@@ -11,11 +11,27 @@
     <nav class="navbar">
         <ul>
             <li><a href="/">Home</a></li>
-            {% if is_admin %}
+            {%if is_admin%}
                 <li><a href="/admin">Admin Dashboard</a></li>
-            {% endif %}
+            {%endif %}
             <li><a href="/about">About</a></li>
             <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/create-event">Create Event</a></li>
+            <li><a href="/events">All events</a></li>
+            <li><a href="/my-bookings">Booked Tickets</a></li>
+            <li><a href="/make-appointment">Appointments</a></li>
+            <li><a href="/profile">Profile</a></li>
+            <li class="nav-item" style="background-color: rgb(201, 221, 239); border-radius: 50%;">
+                {% if has_notifications %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/active.png') }}" alt="Active Notifications" class="notification-icon">
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/inactive.png') }}" alt="No Notifications" class="notification-icon">
+                    </a>
+                {% endif %}
+            </li>
             <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>
@@ -26,21 +42,26 @@
         <!-- User Information Card -->
         <div class="card">
             <h2>User Information</h2>
-            <form method="POST">
-                <label>Name:</label>
-                <input type="text" name="name" value="{{ user.name }}" required>
+            <form id="profileForm" method="POST">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" value="{{ user.name }}" required>
+                <small class="error" id="nameError"></small>
                 
-                <label>Phone Number:</label>
-                <input type="text" name="phone_number" value="{{ user.phone_number }}" required>
+                <label for="phone_number">Phone Number:</label>
+                <input type="text" id="phone_number" name="phone_number" value="{{ user.phone_number }}" required>
+                <small class="error" id="phoneError"></small>
                 
-                <label>Date of Birth:</label>
-                <input type="date" name="dob" value="{{ user.dob }}">
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" name="dob" value="{{ user.dob }}">
+                <small class="error" id="dobError"></small>
                 
-                <label>City:</label>
-                <input type="text" name="city" value="{{ user.city }}" required>
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city" value="{{ user.city }}" required>
+                <small class="error" id="cityError"></small>
                 
-                <label>State:</label>
-                <input type="text" name="state" value="{{ user.state }}" required>
+                <label for="state">State:</label>
+                <input type="text" id="state" name="state" value="{{ user.state }}" required>
+                <small class="error" id="stateError"></small>
                 
                 <button type="submit">Update Information</button>
             </form>
@@ -50,19 +71,43 @@
         <div class="card">
             <h2>My Events</h2>
             {% if events %}
-                <ul>
-                    {% for event in events %}
-                        <li>
-                            <strong>{{ event.college_name }}</strong> - {{ event.event_detail }}
-                            <br>Location: {{ event.location }}
-                            <br>Date: {{ event.start_datetime.strftime('%Y-%m-%d %H:%M') }} to {{ event.end_datetime.strftime('%Y-%m-%d %H:%M') }}
-                        </li>
-                    {% endfor %}
-                </ul>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Location</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events %}
+                            <tr>
+                                <td>{{ event.college_name }}</td>
+                                <td>{{ event.location }}</td>
+                                <td>{{ event.start_datetime.strftime('%Y-%m-%d %H:%M') }} - {{ event.end_datetime.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% for payment in event.eve_payements %}
+                                        {{ payment.status }}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for payment in event.eve_payements %}
+                                        {% if payment.status == 'Pending' %}
+                                            <a href="{{ url_for('event_payment', event_id=event.id) }}" class="btn btn-primary">Pay Now</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             {% else %}
                 <p>You have not created any events yet.</p>
             {% endif %}
         </div>
+        
 
         <!-- Tickets Booked Card -->
         <div class="card">
@@ -75,6 +120,8 @@
                             <th>Location</th>
                             <th>Booking Date</th>
                             <th>Tickets</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,6 +131,18 @@
                                 <td>{{ ticket.event.location }}</td>
                                 <td>{{ ticket.booking_date.strftime('%Y-%m-%d %H:%M') }}</td>
                                 <td>{{ ticket.number_of_tickets }}</td>
+                                <td>
+                                    {% for payment in ticket.tic_payements %}
+                                        {{ payment.status }}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for payment in ticket.tic_payements %}
+                                        {% if payment.status == 'Pending' %}
+                                            <a href="{{ url_for('ticket_payment', ticket_id=ticket.id) }}" class="btn btn-primary">Pay Now</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -91,7 +150,70 @@
             {% else %}
                 <p>You have not booked any tickets yet.</p>
             {% endif %}
-        </div>
+        </div>        
     </div>
+    <script>
+        document.getElementById("profileForm").addEventListener("submit", function(event) {
+            let isValid = true;
+    
+            // Name validation: Should only contain letters and spaces
+            const nameField = document.getElementById("name");
+            const nameError = document.getElementById("nameError");
+            const nameRegex = /^[a-zA-Z\s]+$/;
+            if (!nameRegex.test(nameField.value.trim())) {
+                nameError.textContent = "Name must contain only letters and spaces.";
+                isValid = false;
+            } else {
+                nameError.textContent = "";
+            }
+    
+            // Phone number validation: Should be 10 digits
+            const phoneField = document.getElementById("phone_number");
+            const phoneError = document.getElementById("phoneError");
+            const phoneRegex = /^[0-9]{10}$/;
+            if (!phoneRegex.test(phoneField.value.trim())) {
+                phoneError.textContent = "Phone number must be exactly 10 digits.";
+                isValid = false;
+            } else {
+                phoneError.textContent = "";
+            }
+    
+            // Date of birth validation: Cannot be a future date
+            const dobField = document.getElementById("dob");
+            const dobError = document.getElementById("dobError");
+            const today = new Date().toISOString().split("T")[0];
+            if (dobField.value && dobField.value > today) {
+                dobError.textContent = "Date of birth cannot be in the future.";
+                isValid = false;
+            } else {
+                dobError.textContent = "";
+            }
+    
+            // City validation: Must not be empty
+            const cityField = document.getElementById("city");
+            const cityError = document.getElementById("cityError");
+            if (cityField.value.trim() === "") {
+                cityError.textContent = "City cannot be empty.";
+                isValid = false;
+            } else {
+                cityError.textContent = "";
+            }
+    
+            // State validation: Must not be empty
+            const stateField = document.getElementById("state");
+            const stateError = document.getElementById("stateError");
+            if (stateField.value.trim() === "") {
+                stateError.textContent = "State cannot be empty.";
+                isValid = false;
+            } else {
+                stateError.textContent = "";
+            }
+    
+            // Prevent form submission if validation fails
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
 </body>
 </html>

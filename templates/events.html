@@ -20,7 +20,18 @@
             <li><a href="/events">All events</a></li>
             <li><a href="/my-bookings">Booked Tickets</a></li>
             <li><a href="/make-appointment">Appointments</a></li>
-            <li><a href="/messages">N</a></li>
+            <li><a href="/profile">Profile</a></li>
+            <li class="nav-item" style="background-color: rgb(201, 221, 239); border-radius: 50%;">
+                {% if has_notifications %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/active.png') }}" alt="Active Notifications" class="notification-icon">
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/inactive.png') }}" alt="No Notifications" class="notification-icon">
+                    </a>
+                {% endif %}
+            </li>
             <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>
@@ -59,9 +70,10 @@
                     <td>{{ event.location }}</td>
                     <td>{{ event.start_datetime.strftime('%Y-%m-%d %H:%M') }}</td>
                     <td>{{ event.end_datetime.strftime('%Y-%m-%d %H:%M') }}</td>
-                    <td>${{ event.price }}</td>
+                    <td>₹{{ event.price }}</td>
                     <td>{{ event.available_tickets }}</td>
-                    <td><a href="{{ url_for('book_ticket', event_id=event.id) }}" class="btn">Book Ticket</a></td>
+                    <td><a href="{{ url_for('book_ticket', event_id=event.id) }}" class="btn">Book Ticket</a>
+                    </td>
                 </tr>
                 {% else %}
                     <tr>

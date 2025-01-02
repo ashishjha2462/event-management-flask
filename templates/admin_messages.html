@@ -20,7 +20,18 @@
             <li><a href="/events">All events</a></li>
             <li><a href="/my-bookings">Booked Tickets</a></li>
             <li><a href="/make-appointment">Appointments</a></li>
-            <li><a href="/messages">N</a></li>
+            <li><a href="/profile">Profile</a></li>
+            <li class="nav-item" style="background-color: rgb(201, 221, 239); border-radius: 50%;">
+                {% if has_notifications %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/active.png') }}" alt="Active Notifications" class="notification-icon">
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('messages') }}" class="nav-link">
+                        <img src="{{ url_for('static', filename='assets/inactive.png') }}" alt="No Notifications" class="notification-icon">
+                    </a>
+                {% endif %}
+            </li>
             <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>
@@ -81,7 +92,7 @@
                 <td>{{ msg.status }}</td>
                 <td>
                     {% if msg.status == 'unread' and c_user.username != msg.sender%}
-                    <form method="POST" action="{{ url_for('mark_message_read_user', message_id=msg.id) }}" style="display:inline;">
+                    <form method="POST" action="{{ url_for('mark_message_read', message_id=msg.id) }}" style="display:inline;">
                         <button type="submit">Mark as Read</button>
                     </form>
                     {% endif %}
